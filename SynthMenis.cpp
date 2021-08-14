@@ -25,6 +25,7 @@ MidiHandler<MidiUartTransport>::Config midi_cfg;
 float                                  semiMultiplier = 1;
 float                                  osc1Freq       = 0;
 uint8_t                                finished;
+int                                    navigation = 0;
 
 void HandleMidiMessage(MidiEvent m)
 {
@@ -113,6 +114,10 @@ int main(void)
     screen.Init(disp_cfg);
     synthmenu.buttonLeft.Init(hw.GetPin(27), (samplerate));
     synthmenu.buttonRight.Init(hw.GetPin(26), (samplerate));
+    synthmenu.encoderLeft.Init(
+        hw.GetPin(16), hw.GetPin(17), hw.GetPin(15), samplerate);
+    synthmenu.encoderRight.Init(
+        hw.GetPin(19), hw.GetPin(20), hw.GetPin(18), samplerate);
     hw.StartAudio(AudioCallback);
 
     for(int i = 0; i < 2; i++)
@@ -135,16 +140,37 @@ int main(void)
 
     while(1)
     {
-        synthmenu.analogRead = hw.adc.GetFloat(1);
-        synthmenu.analogReadNav  = hw.adc.GetFloat(0);
+        synthmenu.analogRead
+            += ((float)synthmenu.encoderRight.Increment()) / 32;
+        if(synthmenu.analogRead > 1)
+        {
+            synthmenu.analogRead = 1;
+        }
+        if(synthmenu.analogRead < 0)
+        {
+            synthmenu.analogRead = 0;
+        }
+        hw.SetLed(synthmenu.encoderRight.Pressed());
         midi.Listen();
         synthmenu.buttonLeft.Debounce();
         synthmenu.buttonRight.Debounce();
-        if(synthmenu.analogReadNav < 0.5)
+        synthmenu.encoderLeft.Debounce();
+        synthmenu.encoderRight.Debounce();
+        navigation += synthmenu.encoderLeft.Increment();
+        if(navigation > 1)
+        {
+            navigation = 1;
+        }
+        if(navigation < 0)
+        {
+            navigation = 0;
+        }
+
+        if(navigation == 0)
         {
             synthmenu.Menu1(screen, osc);
         }
-        else
+        else if(navigation == 1)
         {
             synthmenu.Menu2(screen, osc);
         }

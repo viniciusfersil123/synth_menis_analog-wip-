@@ -18,6 +18,7 @@ Menus::Menus()
     this->glideTime               = 1;
     this->circleGlideTimePosition = 64;
     sprintf(this->buffPitchTime,"Time_50%%");
+    
 }
 
 int Menus::WaveSelect(float select)
@@ -65,14 +66,6 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 {
     screen.Fill(!on);
 
-    if(abs(this->analogRead - this->analogLastRead) > 0.001)
-    {
-        this->updateValue = true;
-    }
-    else
-    {
-        this->updateValue = false;
-    }
     if(this->buttonLeft.RisingEdge())
 
     {
@@ -137,17 +130,15 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 
     if(menuState == 0)
     {
-        if(this->updateValue)
-        {
+        
             this->OscSelector = OscSelect(this->analogRead);
             on                = this->OscSelector;
-        }
+        
         screen.DrawRect(0, 0, 60, screen.Height() / 2 - 3, on, false);
     }
     else if(menuState == 1)
     {
-        if(this->updateValue)
-        {
+       
             if(this->OscSelector == true)
             {
                 this->noteSemiAdd    = this->analogRead * 40;
@@ -160,15 +151,14 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                 this->drawSliderSemi2 = this->analogRead;
                 sprintf(this->buff2, "Semi_%dst", this->noteSemiAdd2);
             }
-        }
+        
 
         screen.DrawRect(
             60, 0, screen.Width() - 1, screen.Height() / 2 - 3, on, false);
     }
     else if(menuState == 2)
     {
-        if(this->updateValue)
-        {
+        
             if(this->OscSelector == true)
             {
                 this->toggleOsc = !OscSelect(this->analogRead);
@@ -193,14 +183,13 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                     synthOn2 = 0;
                 }
             }
-        }
+        
         screen.DrawRect(
             0, screen.Height() / 2 - 3, 29, screen.Height() - 1, on, false);
     }
     else if(menuState == 3)
     {
-        if(this->updateValue)
-        {
+        
             int setWave;
             selectedWave = WaveSelect(this->analogRead);
             setWave      = selectedWave;
@@ -259,14 +248,13 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                     osc[1].SetWaveform(osc[1].WAVE_SAW);
                 }
             }
-        }
+        
         screen.DrawRect(
             29, screen.Height() / 2 - 3, 60, screen.Height() - 1, on, false);
     }
     else if(menuState == 4)
     {
-        if(this->updateValue)
-        {
+        
             if(this->OscSelector == true)
             {
                 drawSliderFine = this->analogRead;
@@ -279,7 +267,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                 freqFine2       = this->analogRead;
                 sprintf(this->buffFine2, "Fine_%d%%", (int)(freqFine2 * 100));
             }
-        }
+        
         screen.DrawRect(60,
                         screen.Height() / 2 - 3,
                         screen.Width() - 1,
@@ -288,7 +276,6 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                         false);
     }
     //noteCross            = noteCross + (this->drawSliderSemi * 100);
-    this->analogLastRead = this->analogRead;
     screen.Update();
 }
 
