@@ -47,6 +47,13 @@ class Menus
     int            synthOn2;
     float          freqFine;
     float          freqFine2;
+    float          enconderScaleFactor;
+    int            state;
+    int            stateWave;
+    int toggleState;
+    int toggleState2;
+    int setWave;
+    int setWave2;
 
   private:
     bool on;

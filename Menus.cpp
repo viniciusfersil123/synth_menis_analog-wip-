@@ -12,34 +12,50 @@ Menus::Menus()
     this->OscSelector             = true;
     this->synthOn                 = 1;
     this->synthOn2                = 1;
-    this->freqFine2               = 1;
-    this->freqFine                = 1;
+    this->freqFine2               = 0;
+    this->freqFine                = 0;
     this->analogRead              = 0;
     this->glideTime               = 1;
     this->circleGlideTimePosition = 64;
-    sprintf(this->buffPitchTime,"Time_50%%");
-    
+    this->state                   = 1;
+    this->stateWave               = 0;
+    this->toggleState             = 1;
+    this->toggleState2            = 1;
+    this->setWave                 = 0;
+    this->setWave2                = 0;
+
+    sprintf(this->buffPitchTime, "Time_50%%");
 }
 
 int Menus::WaveSelect(float select)
 {
+    this->stateWave += this->encoderRight.Increment();
     int state;
-    if(select >= 0 && select < 0.25)
+    if(this->stateWave > 3)
+    {
+        this->stateWave = 3;
+    }
+    if(this->stateWave < 0)
+    {
+        this->stateWave = 0;
+    }
+
+    if(this->stateWave == 0)
     {
         state = 0;
         return state;
     }
-    else if(select >= 0 && select < 0.5)
+    else if(this->stateWave == 1)
     {
         state = 1;
         return state;
     }
-    else if(select >= 0.5 && select < 0.75)
+    else if(this->stateWave == 2)
     {
         state = 2;
         return state;
     }
-    else if(select >= 0.75 && select < 1)
+    else if(this->stateWave == 3)
     {
         state = 3;
         return state;
@@ -48,8 +64,18 @@ int Menus::WaveSelect(float select)
 
 bool Menus::OscSelect(float select)
 {
-    bool state;
-    if(select >= 0.5)
+    this->state += this->encoderRight.Increment();
+    if(this->state > 1)
+    {
+        this->state = 1;
+    }
+    if(this->state < 0)
+    {
+        this->state = 0;
+    }
+
+
+    if(this->state == 1)
     {
         state = true;
         return state;
@@ -65,21 +91,20 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 
 {
     screen.Fill(!on);
-
     if(this->buttonLeft.RisingEdge())
 
     {
         menuState = menuState - 1;
         if(menuState < 0)
         {
-            menuState = 4;
+            menuState = 3;
         }
     }
     if(this->buttonRight.RisingEdge())
 
     {
         menuState = menuState + 1;
-        if(menuState > 4)
+        if(menuState > 3)
         {
             menuState = 0;
         }
@@ -89,7 +114,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 
     if(this->OscSelector == true)
     {
-        screen.drawSlider(70, 7, 50, 3, on, this->drawSliderSemi);
+        screen.drawSlider(70, 7, 50, 3, on, ((this->drawSliderSemi)) / 40);
         screen.drawSlider(70, 40, 50, 3, on, drawSliderFine);
         screen.drawVerticalToggle(13, 51, 8, on, this->toggleOsc, "");
         screen.WaveIcons(35, 42, 55, this->selectedWave, on);
@@ -100,7 +125,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
     }
     else
     {
-        screen.drawSlider(70, 7, 50, 3, false, this->drawSliderSemi2);
+        screen.drawSlider(70, 7, 50, 3, false, (this->drawSliderSemi2) / 40);
         screen.drawSlider(70, 40, 50, 3, false, drawSliderFine2);
         screen.drawVerticalToggle(13, 51, 8, false, this->toggleOsc2, "");
         screen.WaveIcons(35, 42, 55, this->selectedWave2, false);
@@ -128,146 +153,261 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
         screen.DrawPixel(29, i * 2, on);
     }
 
-    if(menuState == 0)
+    if(encoderLeft.RisingEdge())
     {
-        
-            this->OscSelector = OscSelect(this->analogRead);
-            on                = this->OscSelector;
-        
-        screen.DrawRect(0, 0, 60, screen.Height() / 2 - 3, on, false);
+        this->OscSelector = !this->OscSelector;
+        on                = this->OscSelector;
     }
-    else if(menuState == 1)
+    else if(menuState == 0)
     {
-       
-            if(this->OscSelector == true)
+        if(this->OscSelector == true)
+        {
+            if(this->noteSemiAdd > 32)
             {
-                this->noteSemiAdd    = this->analogRead * 40;
-                this->drawSliderSemi = this->analogRead;
-                sprintf(this->buff, "Semi_%dst", this->noteSemiAdd);
+                this->noteSemiAdd = 32;
             }
-            else
+            if(this->noteSemiAdd < 0)
             {
-                this->noteSemiAdd2    = this->analogRead * 40;
-                this->drawSliderSemi2 = this->analogRead;
-                sprintf(this->buff2, "Semi_%dst", this->noteSemiAdd2);
+                this->noteSemiAdd = 0;
             }
-        
+            if(this->drawSliderSemi >= 40)
+            {
+                this->drawSliderSemi = 40;
+            }
+            if(this->drawSliderSemi < 0)
+            {
+                this->drawSliderSemi = 0;
+            }
+            this->noteSemiAdd += this->encoderRight.Increment();
+            this->drawSliderSemi
+                += (((float)this->encoderRight.Increment()) / 32) * 40;
+            sprintf(this->buff, "Semi_%dst", this->noteSemiAdd);
+        }
+        else
+        {
+            if(this->noteSemiAdd2 > 32)
+            {
+                this->noteSemiAdd2 = 32;
+            }
+            if(this->noteSemiAdd2 < 0)
+            {
+                this->noteSemiAdd2 = 0;
+            }
+            if(this->drawSliderSemi2 >= 40)
+            {
+                this->drawSliderSemi2 = 40;
+            }
+            if(this->drawSliderSemi2 < 0)
+            {
+                this->drawSliderSemi2 = 0;
+            }
+            this->noteSemiAdd2 += (float)this->encoderRight.Increment();
+            this->drawSliderSemi2
+                += (((float)this->encoderRight.Increment()) / 32) * 40;
+            sprintf(this->buff2, "Semi_%dst", this->noteSemiAdd2);
+        }
+
 
         screen.DrawRect(
             60, 0, screen.Width() - 1, screen.Height() / 2 - 3, on, false);
     }
-    else if(menuState == 2)
+    else if(menuState == 1)
     {
-        
-            if(this->OscSelector == true)
+        if(this->OscSelector == true)
+
+        {
+            if(this->encoderRight.Increment() == 1)
             {
-                this->toggleOsc = !OscSelect(this->analogRead);
-                if(OscSelect(this->analogRead))
-                {
-                    synthOn = 1;
-                }
-                else
-                {
-                    synthOn = 0;
-                }
+                synthOn         = 1;
+                this->toggleOsc = false;
             }
-            else
+            if(this->encoderRight.Increment() == -1)
             {
-                this->toggleOsc2 = !OscSelect(this->analogRead);
-                if(OscSelect(this->analogRead))
-                {
-                    synthOn2 = 1;
-                }
-                else
-                {
-                    synthOn2 = 0;
-                }
+                synthOn         = 0;
+                this->toggleOsc = true;
             }
-        
+        }
+        else
+        {
+            if(this->encoderRight.Increment() == 1)
+            {
+                synthOn2         = 1;
+                this->toggleOsc2 = false;
+            }
+            if(this->encoderRight.Increment() == -1)
+            {
+                synthOn2         = 0;
+                this->toggleOsc2 = true;
+            }
+        }
+
         screen.DrawRect(
             0, screen.Height() / 2 - 3, 29, screen.Height() - 1, on, false);
     }
-    else if(menuState == 3)
+    else if(menuState == 2)
     {
-        
-            int setWave;
-            selectedWave = WaveSelect(this->analogRead);
-            setWave      = selectedWave;
-            if(setWave == 0)
+        if(this->OscSelector == true)
+        {
+            this->setWave += this->encoderRight.Increment();
+            if(setWave > 3)
+            {
+                this->setWave = 3;
+            }
+            if(this->setWave < 0)
+            {
+                this->setWave = 0;
+            }
+            if(this->setWave == 0)
             {
                 for(int i = 0; i < 2; i++)
                 {
-                    if(this->OscSelector == true)
-                    {
-                        selectedWave = setWave;
-                        osc[0].SetWaveform(osc[0].WAVE_SIN);
-                    }
-                    else
-                    {
-                        selectedWave2 = setWave;
-                        osc[1].SetWaveform(osc[1].WAVE_SIN);
-                    }
+                    selectedWave = setWave;
+                    osc[0].SetWaveform(osc[0].WAVE_SIN);
                 }
             }
             else if(setWave == 1)
             {
-                if(OscSelector == true)
+                for(int i = 0; i < 2; i++)
                 {
                     selectedWave = setWave;
                     osc[0].SetWaveform(osc[0].WAVE_TRI);
                 }
-                else
-                {
-                    selectedWave2 = setWave;
-                    osc[1].SetWaveform(osc[1].WAVE_TRI);
-                }
             }
             else if(setWave == 2)
             {
-                if(this->OscSelector == true)
+                for(int i = 0; i < 2; i++)
                 {
                     selectedWave = setWave;
                     osc[0].SetWaveform(osc[0].WAVE_SQUARE);
                 }
-                else
-                {
-                    selectedWave2 = setWave;
-                    osc[1].SetWaveform(osc[1].WAVE_SQUARE);
-                }
             }
             else if(setWave == 3)
             {
-                if(OscSelector == true)
+                for(int i = 0; i < 2; i++)
                 {
                     selectedWave = setWave;
                     osc[0].SetWaveform(osc[0].WAVE_SAW);
                 }
-                else
+            }
+        }
+        {
+            if(this->OscSelector == false)
+            {
+                if(setWave2 > 3)
                 {
-                    selectedWave2 = setWave;
-                    osc[1].SetWaveform(osc[1].WAVE_SAW);
+                    this->setWave2 = 3;
+                }
+                if(this->setWave2 < 0)
+                {
+                    this->setWave2 = 0;
+                }
+                this->setWave2 += this->encoderRight.Increment();
+                if(setWave2 > 3)
+                {
+                    this->setWave2 = 3;
+                }
+                if(this->setWave2 < 0)
+                {
+                    this->setWave2 = 0;
+                }
+                if(this->setWave2 == 0)
+                {
+                    for(int i = 0; i < 2; i++)
+                    {
+                        selectedWave2 = setWave2;
+                        osc[1].SetWaveform(osc[1].WAVE_SIN);
+                    }
+                }
+                else if(setWave2 == 1)
+                {
+                    for(int i = 0; i < 2; i++)
+                    {
+                        selectedWave2 = setWave2;
+                        osc[1].SetWaveform(osc[1].WAVE_TRI);
+                    }
+                }
+                else if(setWave2 == 2)
+                {
+                    for(int i = 0; i < 2; i++)
+                    {
+                        selectedWave2 = setWave2;
+                        osc[1].SetWaveform(osc[1].WAVE_SQUARE);
+                    }
+                }
+                else if(setWave2 == 3)
+                {
+                    for(int i = 0; i < 2; i++)
+                    {
+                        selectedWave2 = setWave2;
+                        osc[1].SetWaveform(osc[1].WAVE_SAW);
+                    }
                 }
             }
-        
-        screen.DrawRect(
-            29, screen.Height() / 2 - 3, 60, screen.Height() - 1, on, false);
+
+
+            screen.DrawRect(29,
+                            screen.Height() / 2 - 3,
+                            60,
+                            screen.Height() - 1,
+                            on,
+                            false);
+        }
     }
-    else if(menuState == 4)
+    else if(menuState == 3)
     {
-        
-            if(this->OscSelector == true)
+        /*  this->noteSemiAdd
+                += (((float)this->encoderRight.Increment()) / 32) * 40;
+            this->drawSliderSemi
+                += ((float)this->encoderRight.Increment()) / 32; */
+
+
+        if(this->OscSelector == true)
+        {
+            if(this->freqFine >= 1)
             {
-                drawSliderFine = this->analogRead;
-                freqFine       = this->analogRead;
-                sprintf(this->buffFine, "Fine_%d%%", (int)(freqFine * 100));
+                this->freqFine = 1;
             }
-            else
+            if(this->freqFine < 0)
             {
-                drawSliderFine2 = this->analogRead;
-                freqFine2       = this->analogRead;
-                sprintf(this->buffFine2, "Fine_%d%%", (int)(freqFine2 * 100));
+                this->freqFine = 0;
             }
-        
+            if(this->drawSliderFine >= 1)
+            {
+                this->drawSliderFine = 1;
+            }
+            if(this->drawSliderFine < 0)
+            {
+                this->drawSliderFine = 0;
+            }
+
+            this->freqFine += (((float)this->encoderRight.Increment()) / 32);
+            this->drawSliderFine += (((float)this->encoderRight.Increment()) / 32);
+            sprintf(this->buffFine, "Fine_%d%%", (int)(freqFine * 100));
+        }
+        else
+        {
+            if(this->freqFine2 > 1)
+            {
+                this->freqFine2 = 1;
+            }
+            if(this->freqFine2 < 0)
+            {
+                this->freqFine2 = 0;
+            }
+            if(this->drawSliderFine2 >= 1)
+            {
+                this->drawSliderFine2 = 1;
+            }
+            if(this->drawSliderFine2 < 0)
+            {
+                this->drawSliderFine2 = 0;
+            }
+
+             this->freqFine2 += (((float)this->encoderRight.Increment()) / 32);
+            this->drawSliderFine2 += (((float)this->encoderRight.Increment()) / 32);
+            sprintf(this->buffFine2, "Fine_%d%%", (int)(freqFine2 * 100));
+        }
+
         screen.DrawRect(60,
                         screen.Height() / 2 - 3,
                         screen.Width() - 1,

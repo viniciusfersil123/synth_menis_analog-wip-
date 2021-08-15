@@ -19,7 +19,6 @@ Oscillator                             osc[2];
 Line                                   line;
 Adsr                                   env;
 bool                                   gate;
-float                                  analogRead = 0;
 MidiHandler<MidiUartTransport>         midi;
 MidiHandler<MidiUartTransport>::Config midi_cfg;
 float                                  semiMultiplier = 1;
@@ -102,11 +101,11 @@ int main(void)
     sprintf(synthmenu.buffFine2, "Fine_%d%%", (int)(synthmenu.freqFine2 * 100));
     hw.usb_handle.Init(UsbHandle::FS_INTERNAL);
     System::Delay(250);
-    AdcChannelConfig adc_config[2];
-    adc_config[0].InitSingle(hw.GetPin(24));
-    adc_config[1].InitSingle(hw.GetPin(25));
-    hw.adc.Init(adc_config, 2);
-    hw.adc.Start();
+    //AdcChannelConfig adc_config[2];
+    //adc_config[0].InitSingle(hw.GetPin(24));
+    //adc_config[1].InitSingle(hw.GetPin(25));
+    //hw.adc.Init(adc_config, 2);
+    //hw.adc.Start();
     float                           samplerate = hw.AudioSampleRate();
     OledDisplayExtravaganza::Config disp_cfg;
     disp_cfg.driver_config.transport_config.pin_config.dc    = hw.GetPin(9);
@@ -138,10 +137,9 @@ int main(void)
     midi.StartReceive();
 
 
-    while(1)
-    {
-        synthmenu.analogRead
-            += ((float)synthmenu.encoderRight.Increment()) / 32;
+   
+    while(1)    {
+        
         if(synthmenu.analogRead > 1)
         {
             synthmenu.analogRead = 1;
