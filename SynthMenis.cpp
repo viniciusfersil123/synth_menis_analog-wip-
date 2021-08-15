@@ -45,7 +45,7 @@ void HandleMidiMessage(MidiEvent m)
             {
                 //osc1Freq = p.note;
                 line.Start(
-                    p.note + synthmenu.glideInit, p.note, synthmenu.glideTime);
+                    p.note + (synthmenu.glideInit*0.25), p.note, synthmenu.glideTime/100);
                 gate = true;
             }
         }

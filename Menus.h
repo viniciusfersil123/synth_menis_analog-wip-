@@ -29,7 +29,7 @@ class Menus
     float          drawSliderFine2;
     float          circleGlidePosition;
     float          circleGlideTimePosition;
-    float          glideInit;
+    int          glideInit;
     float          glideTime;
     bool           toggleOsc;
     bool           toggleOsc2;

@@ -16,15 +16,14 @@ Menus::Menus()
     this->freqFine                = 0;
     this->analogRead              = 0;
     this->glideTime               = 1;
-    this->circleGlideTimePosition = 64;
+    this->circleGlideTimePosition = 10;
     this->state                   = 1;
     this->stateWave               = 0;
     this->toggleState             = 1;
     this->toggleState2            = 1;
     this->setWave                 = 0;
     this->setWave2                = 0;
-
-    sprintf(this->buffPitchTime, "Time_50%%");
+    sprintf(this->buffPitchTime, "Time_0%%");
 }
 
 int Menus::WaveSelect(float select)
@@ -381,7 +380,8 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
             }
 
             this->freqFine += (((float)this->encoderRight.Increment()) / 32);
-            this->drawSliderFine += (((float)this->encoderRight.Increment()) / 32);
+            this->drawSliderFine
+                += (((float)this->encoderRight.Increment()) / 32);
             sprintf(this->buffFine, "Fine_%d%%", (int)(freqFine * 100));
         }
         else
@@ -403,8 +403,9 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                 this->drawSliderFine2 = 0;
             }
 
-             this->freqFine2 += (((float)this->encoderRight.Increment()) / 32);
-            this->drawSliderFine2 += (((float)this->encoderRight.Increment()) / 32);
+            this->freqFine2 += (((float)this->encoderRight.Increment()) / 32);
+            this->drawSliderFine2
+                += (((float)this->encoderRight.Increment()) / 32);
             sprintf(this->buffFine2, "Fine_%d%%", (int)(freqFine2 * 100));
         }
 
@@ -422,15 +423,6 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 {
     screen.Fill(false);
-
-    if(abs(this->analogRead - this->analogLastRead) > 0.001)
-    {
-        this->updateValue = true;
-    }
-    else
-    {
-        this->updateValue = false;
-    }
     float glideInit;
     float margin = 10;
     float offset = (screen.Height() / 4);
@@ -455,27 +447,57 @@ void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
     }
     if(this->menuStateGlide == 0)
     {
-        if(this->updateValue)
+        if(this->glideInit > 100)
         {
-            circleGlidePosition = ((screen.Height()) + margin) - glideInit;
-            sprintf(this->buffPitchGlide,
-                    "Init_%d%%",
-                    (int)(((glideInit - offset) / 40) * 200) - 100);
-            this->glideInit = (this->analogRead * 24) - 12;
+            this->glideInit = 100;
         }
+        if(this->glideInit < -100)
+        {
+            this->glideInit = -100;
+        }
+
+        int glideScale;
+        glideScale = screen.Height() - ((this->glideInit + 212) * 0.15);
+        this->glideInit += this->encoderRight.Increment();
+        circleGlidePosition = glideScale;
+
+        sprintf(this->buffPitchGlide, "Init_%d%%", this->glideInit);
+
+
+        //(this->analogRead * 24) - 12;
+
         screen.DrawRect(0, 0, 66, 13, true, false);
     }
     else if(this->menuStateGlide == 1)
     {
-        if(this->updateValue)
+         if(this->glideTime >= 100)
         {
-            circleGlideTimePosition
-                = ((this->analogRead * screen.Width() * 0.8) + margin);
-            this->glideTime = this->analogRead * 2;
-            sprintf(this->buffPitchTime,
-                    "Time_%d%%",
-                    (int)(((glideInit - offset) / 40) * 100) - 0);
+            this->glideTime = 100;
         }
+        if(this->glideTime <= 0)
+        {
+            this->glideTime = 0;
+        } 
+        if(circleGlidePosition >= 100)
+        {
+            circleGlidePosition = 100;
+        }
+        if(circleGlidePosition <= 0)
+        {
+            circleGlidePosition = 0;
+        }
+            if(circleGlideTimePosition >= 100)
+        {
+            circleGlideTimePosition = 100;
+        }
+        if(circleGlideTimePosition <= 10)
+        {
+            circleGlideTimePosition = 10;
+        }
+        circleGlideTimePosition += this->encoderRight.Increment();
+        ;
+        this->glideTime += this->encoderRight.Increment();
+        sprintf(this->buffPitchTime, "Time_%d%%", (int)this->glideTime);
         screen.DrawRect(67, 0, screen.Width() - 2, 13, true, false);
     }
 
@@ -494,7 +516,7 @@ void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
     {
         screen.DrawPixel(i * 3, (screen.Height() / 2), on);
     }
-    this->analogLastRead = this->analogRead;
+
 
     screen.Update();
 }
