@@ -48,6 +48,7 @@ void HandleMidiMessage(MidiEvent m)
                            p.note,
                            synthmenu.glideTime / 100);
                 gate = true;
+                //env.Retrigger(true);
             }
         }
         break;
@@ -133,7 +134,6 @@ int main(void)
     env.SetTime(ADSR_SEG_DECAY, .1);
     env.SetTime(ADSR_SEG_RELEASE, .25);
     env.SetSustainLevel(.5);
-    env.Retrigger(true);
     midi.Init(midi_cfg);
     midi.StartReceive();
 
@@ -174,7 +174,7 @@ int main(void)
         }
         else if(navigation == 2)
         {
-            synthmenu.Menu3(screen, osc);
+            synthmenu.Menu3(screen, osc,env);
         }
 
 

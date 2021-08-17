@@ -526,7 +526,7 @@ void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 }
 
 
-void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
+void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[], daisysp::Adsr& env)
 {
     screen.Fill(false);
     if(this->buttonLeft.RisingEdge())
@@ -550,6 +550,7 @@ void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
     if(menuStateEnv == 0)
     {
         this->attackTime += this->encoderRight.Increment() * 3.3;
+        env.SetTime(daisysp::ADSR_SEG_ATTACK, this->attackTime/100);
         this->attackTimeScaleDraw += this->encoderRight.Increment();
         if(attackTimeScaleDraw >= screen.Width() / 4)
         {
@@ -572,6 +573,7 @@ void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
     if(menuStateEnv == 1)
     {
         this->decayTime += this->encoderRight.Increment() * 3.3;
+        env.SetTime(daisysp::ADSR_SEG_DECAY, this->decayTime/100);
         this->decayTimeScaleDraw += this->encoderRight.Increment();
         if(decayTimeScaleDraw >= screen.Width() / 4)
         {
@@ -593,7 +595,8 @@ void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
     }
     if(menuStateEnv == 2)
     {
-        this->sustatinLevel += this->encoderRight.Increment() * 3.3;
+        this->sustatinLevel += this->encoderRight .Increment() * 3.3;
+        env.SetSustainLevel(this->sustatinLevel/100);
         this->sustatinLevelScaleDraw += this->encoderRight.Increment();
         if(this->sustatinLevelScaleDraw >= screen.Width() / 4)
         {
@@ -615,7 +618,9 @@ void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
     }
       if(menuStateEnv == 3)
     {
+        
         this->releaseTime += this->encoderRight.Increment() * 3.3;
+        env.SetTime(daisysp::ADSR_SEG_RELEASE, this->releaseTime/100);
         this->releaseTimeScaleDraw += this->encoderRight.Increment();
         if(this->releaseTimeScaleDraw >= screen.Width() / 4)
         {

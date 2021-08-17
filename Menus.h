@@ -10,7 +10,7 @@ class Menus
     Menus();
     void Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[]);
     void Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[]);
-    void Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[]);
+    void Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[],daisysp::Adsr&);
     bool OscSelect(float select);
     int  WaveSelect(float select);
 
