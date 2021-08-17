@@ -10,6 +10,7 @@ class Menus
     Menus();
     void Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[]);
     void Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[]);
+    void Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[]);
     bool OscSelect(float select);
     int  WaveSelect(float select);
 
@@ -29,7 +30,7 @@ class Menus
     float          drawSliderFine2;
     float          circleGlidePosition;
     float          circleGlideTimePosition;
-    int          glideInit;
+    int            glideInit;
     float          glideTime;
     bool           toggleOsc;
     bool           toggleOsc2;
@@ -41,6 +42,8 @@ class Menus
     char           buffFine2[24];
     char           buffPitchGlide[24];
     char           buffPitchTime[24];
+    char           buffAttackTime[24];
+    char           buffDecayTime[24];
     int            noteSemiAdd;
     int            noteSemiAdd2;
     int            synthOn;
@@ -50,10 +53,19 @@ class Menus
     float          enconderScaleFactor;
     int            state;
     int            stateWave;
-    int toggleState;
-    int toggleState2;
-    int setWave;
-    int setWave2;
+    int            toggleState;
+    int            toggleState2;
+    int            setWave;
+    int            setWave2;
+    float          attackTime;
+    float          decayTime;
+    float          attackTimeScaleDraw;
+    int            menuStateEnv;
+    float          decayTimeScaleDraw;
+    float          sustatinLevel;
+    float          sustatinLevelScaleDraw;
+    float          releaseTime;
+    float          releaseTimeScaleDraw;
 
   private:
     bool on;

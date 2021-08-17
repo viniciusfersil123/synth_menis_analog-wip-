@@ -9,6 +9,7 @@ Menus::Menus()
     this->updateValue             = false;
     this->menuState               = 0;
     this->menuStateGlide          = 0;
+    this->menuStateEnv            = 0;
     this->OscSelector             = true;
     this->synthOn                 = 1;
     this->synthOn2                = 1;
@@ -23,6 +24,9 @@ Menus::Menus()
     this->toggleState2            = 1;
     this->setWave                 = 0;
     this->setWave2                = 0;
+    this->attackTime              = 0.1f;
+    this->attackTime              = 0.5f;
+    this->attackTimeScaleDraw     = 0.5f;
     sprintf(this->buffPitchTime, "Time_0%%");
 }
 
@@ -423,10 +427,14 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 {
     screen.Fill(false);
-    float glideInit;
     float margin = 10;
+    float glideInit;
     float offset = (screen.Height() / 4);
     glideInit    = (offset + (this->analogRead * screen.Height() * 0.625));
+    for(int i = 0; i < screen.Width(); i++)
+    {
+        screen.DrawPixel(i * 3, (screen.Height() / 2), on);
+    }
     if(this->buttonLeft.RisingEdge())
 
     {
@@ -470,14 +478,14 @@ void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
     }
     else if(this->menuStateGlide == 1)
     {
-         if(this->glideTime >= 100)
+        if(this->glideTime >= 100)
         {
             this->glideTime = 100;
         }
         if(this->glideTime <= 0)
         {
             this->glideTime = 0;
-        } 
+        }
         if(circleGlidePosition >= 100)
         {
             circleGlidePosition = 100;
@@ -486,7 +494,7 @@ void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
         {
             circleGlidePosition = 0;
         }
-            if(circleGlideTimePosition >= 100)
+        if(circleGlideTimePosition >= 100)
         {
             circleGlideTimePosition = 100;
         }
@@ -512,10 +520,150 @@ void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                     true);
     screen.DrawCircle(margin, circleGlidePosition, 3, true);
     screen.DrawCircle(circleGlideTimePosition, screen.Height() / 2, 3, true);
-    for(int i = 0; i < screen.Width(); i++)
+
+
+    screen.Update();
+}
+
+
+void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
+{
+    screen.Fill(false);
+    if(this->buttonLeft.RisingEdge())
+
     {
-        screen.DrawPixel(i * 3, (screen.Height() / 2), on);
+        this->menuStateEnv = this->menuStateEnv - 1;
+        if(this->menuStateEnv < 0)
+        {
+            this->menuStateEnv = 3;
+        }
     }
+    if(this->buttonRight.RisingEdge())
+
+    {
+        this->menuStateEnv = this->menuStateEnv + 1;
+        if(this->menuStateEnv > 3)
+        {
+            this->menuStateEnv = 0;
+        }
+    }
+    if(menuStateEnv == 0)
+    {
+        this->attackTime += this->encoderRight.Increment() * 3.3;
+        this->attackTimeScaleDraw += this->encoderRight.Increment();
+        if(attackTimeScaleDraw >= screen.Width() / 4)
+        {
+            attackTimeScaleDraw = screen.Width() / 4;
+        }
+        if(attackTimeScaleDraw <= 0)
+        {
+            attackTimeScaleDraw = 0;
+        }
+        if(attackTime >= 100)
+        {
+            attackTime = 100;
+        }
+        if(attackTime <= 0)
+        {
+            attackTime = 0;
+        }
+        screen.DrawRect(28, 0, 40, 13, true, false);
+    }
+    if(menuStateEnv == 1)
+    {
+        this->decayTime += this->encoderRight.Increment() * 3.3;
+        this->decayTimeScaleDraw += this->encoderRight.Increment();
+        if(decayTimeScaleDraw >= screen.Width() / 4)
+        {
+            decayTimeScaleDraw = screen.Width() / 4;
+        }
+        if(decayTimeScaleDraw <= 0)
+        {
+            decayTimeScaleDraw = 0;
+        }
+        if(decayTime >= 100)
+        {
+            decayTime = 100;
+        }
+        if(decayTime <= 0)
+        {
+            decayTime = 0;
+        }
+        screen.DrawRect(44, 0, 56, 13, true, false);
+    }
+    if(menuStateEnv == 2)
+    {
+        this->sustatinLevel += this->encoderRight.Increment() * 3.3;
+        this->sustatinLevelScaleDraw += this->encoderRight.Increment();
+        if(this->sustatinLevelScaleDraw >= screen.Width() / 4)
+        {
+            this->sustatinLevelScaleDraw = screen.Width() / 4;
+        }
+        if(this->sustatinLevelScaleDraw <= 0)
+        {
+            this->sustatinLevelScaleDraw = 0;
+        }
+        if(this->sustatinLevel >= 100)
+        {
+            this->sustatinLevel = 100;
+        }
+        if(this->sustatinLevel <= 0)
+        {
+            this->sustatinLevel = 0;
+        }
+        screen.DrawRect(60, 0, 72, 13, true, false);
+    }
+      if(menuStateEnv == 3)
+    {
+        this->releaseTime += this->encoderRight.Increment() * 3.3;
+        this->releaseTimeScaleDraw += this->encoderRight.Increment();
+        if(this->releaseTimeScaleDraw >= screen.Width() / 4)
+        {
+            this->releaseTimeScaleDraw = screen.Width() / 4;
+        }
+        if(this->releaseTimeScaleDraw <= 0)
+        {
+            this->releaseTimeScaleDraw = 0;
+        }
+        if(this->releaseTime >= 100)
+        {
+            this->releaseTime = 100;
+        }
+        if(this->releaseTime <= 0)
+        {
+            this->releaseTime = 0;
+        }
+        screen.DrawRect(76, 0, 88, 13, true, false);
+    }
+
+    screen.SetCursor(32, 4);
+    screen.WriteString("A", Font_6x8, true);
+    screen.SetCursor(48, 4);
+    screen.WriteString("D", Font_6x8, true);
+    screen.SetCursor(64, 4);
+    screen.WriteString("S", Font_6x8, true);
+    screen.SetCursor(80, 4);
+    screen.WriteString("R", Font_6x8, true);
+    screen.DrawLine(0, screen.Height() - 5, attackTimeScaleDraw, 25, true);
+    screen.DrawLine(attackTimeScaleDraw,
+                    25,
+                    attackTimeScaleDraw + decayTimeScaleDraw,
+                    (screen.Height() - 5) - sustatinLevelScaleDraw,
+                    true);
+
+    screen.DrawLine(attackTimeScaleDraw + decayTimeScaleDraw,
+                    (screen.Height() - 5) - sustatinLevelScaleDraw,
+                    attackTimeScaleDraw + decayTimeScaleDraw
+                        + screen.Width() / 4,
+                    (screen.Height() - 5) - sustatinLevelScaleDraw,
+                    true);
+      screen.DrawLine( attackTimeScaleDraw + decayTimeScaleDraw
+                        + screen.Width() / 4,
+                    (screen.Height() - 5) - sustatinLevelScaleDraw,
+                    attackTimeScaleDraw + decayTimeScaleDraw
+                        + screen.Width() / 4 + releaseTimeScaleDraw, screen.Height()-5,true);
+                  
+                    
 
 
     screen.Update();

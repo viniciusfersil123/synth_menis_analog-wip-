@@ -44,8 +44,9 @@ void HandleMidiMessage(MidiEvent m)
             if(m.data[1] != 0)
             {
                 //osc1Freq = p.note;
-                line.Start(
-                    p.note + (synthmenu.glideInit*0.25), p.note, synthmenu.glideTime/100);
+                line.Start(p.note + (synthmenu.glideInit * 0.25),
+                           p.note,
+                           synthmenu.glideTime / 100);
                 gate = true;
             }
         }
@@ -137,9 +138,8 @@ int main(void)
     midi.StartReceive();
 
 
-   
-    while(1)    {
-        
+    while(1)
+    {
         if(synthmenu.analogRead > 1)
         {
             synthmenu.analogRead = 1;
@@ -148,16 +148,16 @@ int main(void)
         {
             synthmenu.analogRead = 0;
         }
-        hw.SetLed(synthmenu.encoderRight.Pressed());
+
         midi.Listen();
         synthmenu.buttonLeft.Debounce();
         synthmenu.buttonRight.Debounce();
         synthmenu.encoderLeft.Debounce();
         synthmenu.encoderRight.Debounce();
         navigation += synthmenu.encoderLeft.Increment();
-        if(navigation > 1)
+        if(navigation > 2)
         {
-            navigation = 1;
+            navigation = 2;
         }
         if(navigation < 0)
         {
@@ -171,6 +171,10 @@ int main(void)
         else if(navigation == 1)
         {
             synthmenu.Menu2(screen, osc);
+        }
+        else if(navigation == 2)
+        {
+            synthmenu.Menu3(screen, osc);
         }
 
 
