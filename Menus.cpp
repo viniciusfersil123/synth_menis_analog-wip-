@@ -10,6 +10,7 @@ Menus::Menus()
     this->menuState               = 0;
     this->menuStateGlide          = 0;
     this->menuStateEnv            = 0;
+    this->menuStateEnvFilter      = 0;
     this->OscSelector             = true;
     this->synthOn                 = 1;
     this->synthOn2                = 1;
@@ -526,7 +527,9 @@ void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 }
 
 
-void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[], daisysp::Adsr& env)
+void Menus::Menu3(OledDisplayExtravaganza screen,
+                  daisysp::Oscillator     osc[],
+                  daisysp::Adsr&          env)
 {
     screen.Fill(false);
     if(this->buttonLeft.RisingEdge())
@@ -550,7 +553,7 @@ void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[], dai
     if(menuStateEnv == 0)
     {
         this->attackTime += this->encoderRight.Increment() * 3.3;
-        env.SetTime(daisysp::ADSR_SEG_ATTACK, this->attackTime/100);
+        env.SetTime(daisysp::ADSR_SEG_ATTACK, this->attackTime / 100);
         this->attackTimeScaleDraw += this->encoderRight.Increment();
         if(attackTimeScaleDraw >= screen.Width() / 4)
         {
@@ -573,7 +576,7 @@ void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[], dai
     if(menuStateEnv == 1)
     {
         this->decayTime += this->encoderRight.Increment() * 3.3;
-        env.SetTime(daisysp::ADSR_SEG_DECAY, this->decayTime/100);
+        env.SetTime(daisysp::ADSR_SEG_DECAY, this->decayTime / 100);
         this->decayTimeScaleDraw += this->encoderRight.Increment();
         if(decayTimeScaleDraw >= screen.Width() / 4)
         {
@@ -595,8 +598,8 @@ void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[], dai
     }
     if(menuStateEnv == 2)
     {
-        this->sustatinLevel += this->encoderRight .Increment() * 3.3;
-        env.SetSustainLevel(this->sustatinLevel/100);
+        this->sustatinLevel += this->encoderRight.Increment() * 3.3;
+        env.SetSustainLevel(this->sustatinLevel / 100);
         this->sustatinLevelScaleDraw += this->encoderRight.Increment();
         if(this->sustatinLevelScaleDraw >= screen.Width() / 4)
         {
@@ -616,11 +619,10 @@ void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[], dai
         }
         screen.DrawRect(60, 0, 72, 13, true, false);
     }
-      if(menuStateEnv == 3)
+    if(menuStateEnv == 3)
     {
-        
         this->releaseTime += this->encoderRight.Increment() * 3.3;
-        env.SetTime(daisysp::ADSR_SEG_RELEASE, this->releaseTime/100);
+        env.SetTime(daisysp::ADSR_SEG_RELEASE, this->releaseTime / 100);
         this->releaseTimeScaleDraw += this->encoderRight.Increment();
         if(this->releaseTimeScaleDraw >= screen.Width() / 4)
         {
@@ -662,13 +664,162 @@ void Menus::Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[], dai
                         + screen.Width() / 4,
                     (screen.Height() - 5) - sustatinLevelScaleDraw,
                     true);
-      screen.DrawLine( attackTimeScaleDraw + decayTimeScaleDraw
+    screen.DrawLine(attackTimeScaleDraw + decayTimeScaleDraw
                         + screen.Width() / 4,
                     (screen.Height() - 5) - sustatinLevelScaleDraw,
                     attackTimeScaleDraw + decayTimeScaleDraw
-                        + screen.Width() / 4 + releaseTimeScaleDraw, screen.Height()-5,true);
-                  
-                    
+                        + screen.Width() / 4 + releaseTimeScaleDraw,
+                    screen.Height() - 5,
+                    true);
+
+
+    screen.Update();
+}
+
+void Menus::Menu4(OledDisplayExtravaganza screen,
+                  daisysp::Oscillator     osc[],
+                  daisysp::Adsr&          env)
+{
+    screen.Fill(true);
+    if(this->buttonLeft.RisingEdge())
+
+    {
+        this->menuStateEnvFilter = this->menuStateEnvFilter  - 1;
+        if(this->menuStateEnvFilter  < 0)
+        {
+            this->menuStateEnvFilter  = 3;
+        }
+    }
+    if(this->buttonRight.RisingEdge())
+
+    {
+        this->menuStateEnvFilter  = this->menuStateEnvFilter  + 1;
+        if(this->menuStateEnvFilter  > 3)
+        {
+            this->menuStateEnvFilter  = 0;
+        }
+    }
+    if(this->menuStateEnvFilter  == 0)
+    {
+        this->attackTimeFilter += this->encoderRight.Increment() * 3.3;
+        env.SetTime(daisysp::ADSR_SEG_ATTACK, this->attackTimeFilter / 100);
+        this->attackTimeFilterScaleDraw += this->encoderRight.Increment();
+        if( this->attackTimeFilterScaleDraw >= screen.Width() / 4)
+        {
+             this->attackTimeFilterScaleDraw = screen.Width() / 4;
+        }
+        if( this->attackTimeFilterScaleDraw <= 0)
+        {
+            this->attackTimeFilterScaleDraw = 0;
+        }
+        if(attackTimeFilter >= 100)
+        {
+            attackTimeFilter = 100;
+        }
+        if(attackTimeFilter <= 0)
+        {
+            attackTimeFilter = 0;
+        }
+        screen.DrawRect(28, 0, 40, 13, false, false);
+    }
+    if(this->menuStateEnvFilter  == 1)
+    {
+        this->decayTimeFilter += this->encoderRight.Increment() * 3.3;
+        env.SetTime(daisysp::ADSR_SEG_DECAY, this->decayTimeFilter / 100);
+        this->decayTimeScaleFilterDraw += this->encoderRight.Increment();
+        if(this->decayTimeScaleFilterDraw >= screen.Width() / 4)
+        {
+            this->decayTimeScaleFilterDraw = screen.Width() / 4;
+        }
+        if(this->decayTimeScaleFilterDraw <= 0)
+        {
+            this->decayTimeScaleFilterDraw = 0;
+        }
+        if(decayTimeFilter >= 100)
+        {
+            decayTimeFilter = 100;
+        }
+        if(decayTimeFilter <= 0)
+        {
+            decayTimeFilter = 0;
+        }
+        screen.DrawRect(44, 0, 56, 13, false, false);
+    }
+    if(this->menuStateEnvFilter  == 2)
+    {
+        this->sustatinLevelFilter += this->encoderRight.Increment() * 3.3;
+        env.SetSustainLevel(this->sustatinLevelFilter / 100);
+        this->sustatinLevelScaleFilterDraw += this->encoderRight.Increment();
+        if(this->sustatinLevelScaleFilterDraw >= screen.Width() / 4)
+        {
+           this->sustatinLevelScaleFilterDraw= screen.Width() / 4;
+        }
+        if(this->sustatinLevelScaleFilterDraw <= 0)
+        {
+            this->sustatinLevelScaleFilterDraw = 0;
+        }
+        if(this->sustatinLevelFilter >= 100)
+        {
+            this->sustatinLevelFilter = 100;
+        }
+        if(this->sustatinLevelFilter <= 0)
+        {
+            this->sustatinLevelFilter = 0;
+        }
+        screen.DrawRect(60, 0, 72, 13, false, false);
+    }
+    if(this->menuStateEnvFilter  == 3)
+    {
+        this->releaseTimeFilter += this->encoderRight.Increment() * 3.3;
+        env.SetTime(daisysp::ADSR_SEG_RELEASE, this->releaseTime / 100);
+        this->releaseTimeScaleDraw += this->encoderRight.Increment();
+        if(this->releaseTimeScaleFilterDraw >= screen.Width() / 4)
+        {
+            this->releaseTimeScaleFilterDraw = screen.Width() / 4;
+        }
+        if(this->releaseTimeScaleFilterDraw <= 0)
+        {
+            this->releaseTimeScaleFilterDraw = 0;
+        }
+        if(this->releaseTimeFilter >= 100)
+        {
+            this->releaseTimeFilter = 100;
+        }
+        if(this->releaseTimeFilter <= 0)
+        {
+            this->releaseTimeFilter = 0;
+        }
+        screen.DrawRect(76, 0, 88, 13, false, false);
+    }
+
+    screen.SetCursor(32, 4);
+    screen.WriteString("A", Font_6x8, false);
+    screen.SetCursor(48, 4);
+    screen.WriteString("D", Font_6x8, false);
+    screen.SetCursor(64, 4);
+    screen.WriteString("S", Font_6x8, false);
+    screen.SetCursor(80, 4);
+    screen.WriteString("R", Font_6x8, false);
+    screen.DrawLine(0, screen.Height() - 5, attackTimeFilterScaleDraw, 25, false);
+    screen.DrawLine(attackTimeFilterScaleDraw,
+                    25,
+                    attackTimeFilterScaleDraw + decayTimeScaleFilterDraw,
+                    (screen.Height() - 5) - sustatinLevelScaleFilterDraw,
+                    false);
+
+    screen.DrawLine(attackTimeFilterScaleDraw + decayTimeScaleFilterDraw,
+                    (screen.Height() - 5) - sustatinLevelScaleFilterDraw,
+                    attackTimeFilterScaleDraw + decayTimeScaleFilterDraw
+                        + screen.Width() / 4,
+                    (screen.Height() - 5) - sustatinLevelScaleFilterDraw,
+                    false);
+    screen.DrawLine(attackTimeFilterScaleDraw + decayTimeScaleFilterDraw
+                        + screen.Width() / 4,
+                    (screen.Height() - 5) - sustatinLevelScaleFilterDraw,
+                    attackTimeFilterScaleDraw + decayTimeScaleFilterDraw
+                        + screen.Width() / 4 + releaseTimeScaleFilterDraw,
+                    screen.Height() - 5,
+                    false);
 
 
     screen.Update();

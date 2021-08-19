@@ -155,9 +155,9 @@ int main(void)
         synthmenu.encoderLeft.Debounce();
         synthmenu.encoderRight.Debounce();
         navigation += synthmenu.encoderLeft.Increment();
-        if(navigation > 2)
+        if(navigation > 3)
         {
-            navigation = 2;
+            navigation = 3;
         }
         if(navigation < 0)
         {
@@ -174,7 +174,11 @@ int main(void)
         }
         else if(navigation == 2)
         {
-            synthmenu.Menu3(screen, osc,env);
+            synthmenu.Menu3(screen, osc, env);
+        }
+        else if(navigation == 3)
+        {
+            synthmenu.Menu4(screen, osc, env);
         }
 
 

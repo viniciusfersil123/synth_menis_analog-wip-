@@ -10,7 +10,12 @@ class Menus
     Menus();
     void Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[]);
     void Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[]);
-    void Menu3(OledDisplayExtravaganza screen, daisysp::Oscillator osc[],daisysp::Adsr&);
+    void Menu3(OledDisplayExtravaganza screen,
+               daisysp::Oscillator     osc[],
+               daisysp::Adsr&);
+    void Menu4(OledDisplayExtravaganza screen,
+               daisysp::Oscillator     osc[],
+               daisysp::Adsr&          env);
     bool OscSelect(float select);
     int  WaveSelect(float select);
 
@@ -58,14 +63,23 @@ class Menus
     int            setWave;
     int            setWave2;
     float          attackTime;
-    float          decayTime;
+    float          attackTimeFilter;
+    float          decayTimeFilter;
     float          attackTimeScaleDraw;
+    float          attackTimeFilterScaleDraw;
     int            menuStateEnv;
+    int            menuStateEnvFilter;
+    float          decayTime;
     float          decayTimeScaleDraw;
+    float          decayTimeScaleFilterDraw;
     float          sustatinLevel;
+    float          sustatinLevelFilter;
     float          sustatinLevelScaleDraw;
+    float          sustatinLevelScaleFilterDraw;
     float          releaseTime;
+    float          releaseTimeFilter;
     float          releaseTimeScaleDraw;
+    float          releaseTimeScaleFilterDraw;
 
   private:
     bool on;
