@@ -178,7 +178,7 @@ int main(void)
         }
         else if(navigation == 3)
         {
-            synthmenu.Menu4(screen, osc, env);
+            synthmenu.SplashScreen(screen);
         }
 
 

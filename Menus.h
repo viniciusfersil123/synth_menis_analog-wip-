@@ -18,6 +18,7 @@ class Menus
                daisysp::Adsr&          env);
     bool OscSelect(float select);
     int  WaveSelect(float select);
+    void SplashScreen(OledDisplayExtravaganza screen);
 
     float          analogRead;
     float          analogLastRead;
@@ -80,6 +81,7 @@ class Menus
     float          releaseTimeFilter;
     float          releaseTimeScaleDraw;
     float          releaseTimeScaleFilterDraw;
+   
 
   private:
     bool on;
