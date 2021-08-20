@@ -25,6 +25,8 @@ float                                  semiMultiplier = 1;
 float                                  osc1Freq       = 0;
 uint8_t                                finished;
 int                                    navigation = 0;
+int                                    count      = 0;
+bool                                   splashInit = true;
 
 void HandleMidiMessage(MidiEvent m)
 {
@@ -155,30 +157,40 @@ int main(void)
         synthmenu.encoderLeft.Debounce();
         synthmenu.encoderRight.Debounce();
         navigation += synthmenu.encoderLeft.Increment();
-        if(navigation > 3)
+        if(splashInit == false)
         {
-            navigation = 3;
-        }
-        if(navigation < 0)
-        {
-            navigation = 0;
+            if(navigation > 3)
+            {
+                navigation = 3;
+            }
+            if(navigation < 1)
+            {
+                navigation = 1;
+            }
         }
 
         if(navigation == 0)
         {
-            synthmenu.Menu1(screen, osc);
+            synthmenu.SplashScreen(screen);
+            if(count > 1000)
+            {
+                navigation = 1;
+                count      = 0;
+                splashInit = false;
+            }
+            count++;
         }
         else if(navigation == 1)
         {
-            synthmenu.Menu2(screen, osc);
+            synthmenu.Menu1(screen, osc);
         }
         else if(navigation == 2)
         {
-            synthmenu.Menu3(screen, osc, env);
+            synthmenu.Menu2(screen, osc);
         }
         else if(navigation == 3)
         {
-            synthmenu.SplashScreen(screen);
+            synthmenu.Menu3(screen, osc, env);
         }
 
 

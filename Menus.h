@@ -81,7 +81,10 @@ class Menus
     float          releaseTimeFilter;
     float          releaseTimeScaleDraw;
     float          releaseTimeScaleFilterDraw;
-   
+    float          displayAnimationMovY;
+     bool  colorTemplate;
+
+
 
   private:
     bool on;
