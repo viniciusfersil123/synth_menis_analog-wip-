@@ -15,10 +15,11 @@ DaisySeed                              hw;
 OledDisplayExtravaganza                screen;
 const int                              height = screen.Height();
 const int                              width  = screen.Width();
-Menus::oscVoice                        osc;
-Line                                   line;
-Adsr                                   env;
-bool                                   gate;
+const int                              poly   = 32;
+Menus::oscVoice                        osc[poly];
+Line                                   line[poly];
+Adsr                                   env[poly];
+bool                                   gate[poly];
 MidiHandler<MidiUartTransport>         midi;
 MidiHandler<MidiUartTransport>::Config midi_cfg;
 float                                  semiMultiplier = 1;
@@ -27,6 +28,8 @@ uint8_t                                finished;
 int                                    navigation = 0;
 int                                    count      = 0;
 bool                                   splashInit = true;
+int                                    polyIndexOn;
+int                                    polyIndexOff;
 
 void HandleMidiMessage(MidiEvent m)
 {
@@ -46,10 +49,10 @@ void HandleMidiMessage(MidiEvent m)
             if(m.data[1] != 0)
             {
                 //osc1Freq = p.note;
-                line.Start(p.note + (synthmenu.glideInit * 0.25),
-                           p.note,
-                           synthmenu.glideTime / 100);
-                gate = true;
+                line[0].Start(p.note + (synthmenu.glideInit * 0.25),
+                              p.note,
+                              synthmenu.glideTime / 100);
+                gate[0] = true;
                 //env.Retrigger(true);
             }
         }
@@ -67,7 +70,7 @@ void HandleMidiMessage(MidiEvent m)
             // This is to avoid Max/MSP Note outs for now..
             if(m.data[1] != 0)
             {
-                gate = false;
+                gate[0] = false;
             }
         }
         break;
@@ -84,12 +87,12 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
     float env_out;
     for(size_t i = 0; i < size; i += 2)
     {
-        env_out = env.Process(gate);
+        env_out = env[0].Process(gate[0]);
 
-        osc.osc1.SetAmp((env_out * 0.5) * synthmenu.synthOn);
-        osc.osc2.SetAmp((env_out * 0.5) * synthmenu.synthOn2);
-        osc_out    = osc.osc1.Process() + osc.osc2.Process();
-        osc1Freq   = line.Process(&finished);
+        osc[0].osc1.SetAmp((env_out * 0.5) * synthmenu.synthOn);
+        osc[0].osc2.SetAmp((env_out * 0.5) * synthmenu.synthOn2);
+        osc_out    = osc[0].osc1.Process() + osc[0].osc2.Process();
+        osc1Freq   = line[0].Process(&finished);
         out[i]     = osc_out;
         out[i + 1] = osc_out;
     }
@@ -123,22 +126,28 @@ int main(void)
         hw.GetPin(19), hw.GetPin(20), hw.GetPin(18), samplerate);
     hw.StartAudio(AudioCallback);
 
+    for(size_t i = 0; i < poly; i++)
+    {
+        osc[i].osc1.Init(samplerate);
+        osc[i].osc1.SetWaveform(osc[i].osc1.WAVE_SIN);
+        osc[i].osc1.SetAmp(0.5);
+        osc[i].osc1.SetFreq(440);
+        osc[i].osc2.Init(samplerate);
+        osc[i].osc2.SetWaveform(osc[i].osc2.WAVE_SIN);
+        osc[i].osc2.SetAmp(0.5);
+        osc[i].osc2.SetFreq(440);
+    }
 
-    osc.osc1.Init(samplerate);
-    osc.osc1.SetWaveform(osc.osc1.WAVE_SIN);
-    osc.osc1.SetAmp(0.5);
-    osc.osc1.SetFreq(440);
-    osc.osc2.Init(samplerate);
-    osc.osc2.SetWaveform(osc.osc2.WAVE_SIN);
-    osc.osc2.SetAmp(0.5);
-    osc.osc2.SetFreq(440);
 
-    line.Init(samplerate);
-    env.Init(samplerate);
-    env.SetTime(ADSR_SEG_ATTACK, .05);
-    env.SetTime(ADSR_SEG_DECAY, .1);
-    env.SetTime(ADSR_SEG_RELEASE, .25);
-    env.SetSustainLevel(.5);
+    line[0].Init(samplerate);
+    for(size_t i = 0; i < poly; i++)
+    {
+        env[i].Init(samplerate);
+        env[i].SetTime(ADSR_SEG_ATTACK, .05);
+        env[i].SetTime(ADSR_SEG_DECAY, .1);
+        env[i].SetTime(ADSR_SEG_RELEASE, .25);
+        env[i].SetSustainLevel(.5);
+    }
     midi.Init(midi_cfg);
     midi.StartReceive();
 
@@ -185,15 +194,15 @@ int main(void)
         }
         else if(navigation == 1)
         {
-            synthmenu.Menu1(screen, osc);
+            synthmenu.Menu1(screen, osc[0]);
         }
         else if(navigation == 2)
         {
-            synthmenu.Menu2(screen, osc);
+            synthmenu.Menu2(screen, osc[0]);
         }
         else if(navigation == 3)
         {
-            synthmenu.Menu3(screen, osc, env);
+            synthmenu.Menu3(screen, osc[0], env[0]);
         }
 
 
@@ -201,9 +210,9 @@ int main(void)
         {
             HandleMidiMessage(midi.PopEvent());
         }
-        osc.osc1.SetFreq(mtof(osc1Freq + synthmenu.noteSemiAdd)
-                         * (1 + synthmenu.freqFine));
-        osc.osc2.SetFreq(mtof(osc1Freq + synthmenu.noteSemiAdd2)
-                         * (1 + synthmenu.freqFine2));
+        osc[0].osc1.SetFreq(mtof(osc1Freq + synthmenu.noteSemiAdd)
+                            * (1 + synthmenu.freqFine));
+        osc[0].osc2.SetFreq(mtof(osc1Freq + synthmenu.noteSemiAdd2)
+                            * (1 + synthmenu.freqFine2));
     }
 }
