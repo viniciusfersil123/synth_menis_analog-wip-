@@ -15,7 +15,7 @@ DaisySeed                              hw;
 OledDisplayExtravaganza                screen;
 const int                              height = screen.Height();
 const int                              width  = screen.Width();
-Oscillator                             osc[2];
+Menus::oscVoice                        osc;
 Line                                   line;
 Adsr                                   env;
 bool                                   gate;
@@ -86,9 +86,9 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
     {
         env_out = env.Process(gate);
 
-        osc[0].SetAmp((env_out * 0.5) * synthmenu.synthOn);
-        osc[1].SetAmp((env_out * 0.5) * synthmenu.synthOn2);
-        osc_out    = osc[0].Process() + osc[1].Process();
+        osc.osc1.SetAmp((env_out * 0.5) * synthmenu.synthOn);
+        osc.osc2.SetAmp((env_out * 0.5) * synthmenu.synthOn2);
+        osc_out    = osc.osc1.Process() + osc.osc2.Process();
         osc1Freq   = line.Process(&finished);
         out[i]     = osc_out;
         out[i + 1] = osc_out;
@@ -123,13 +123,16 @@ int main(void)
         hw.GetPin(19), hw.GetPin(20), hw.GetPin(18), samplerate);
     hw.StartAudio(AudioCallback);
 
-    for(int i = 0; i < 2; i++)
-    {
-        osc[i].Init(samplerate);
-        osc[i].SetWaveform(osc[i].WAVE_SIN);
-        osc[i].SetAmp(0.5);
-        osc[i].SetFreq(440);
-    }
+
+    osc.osc1.Init(samplerate);
+    osc.osc1.SetWaveform(osc.osc1.WAVE_SIN);
+    osc.osc1.SetAmp(0.5);
+    osc.osc1.SetFreq(440);
+    osc.osc2.Init(samplerate);
+    osc.osc2.SetWaveform(osc.osc2.WAVE_SIN);
+    osc.osc2.SetAmp(0.5);
+    osc.osc2.SetFreq(440);
+
     line.Init(samplerate);
     env.Init(samplerate);
     env.SetTime(ADSR_SEG_ATTACK, .05);
@@ -198,9 +201,9 @@ int main(void)
         {
             HandleMidiMessage(midi.PopEvent());
         }
-        osc[0].SetFreq(mtof(osc1Freq + synthmenu.noteSemiAdd)
-                       * (1 + synthmenu.freqFine));
-        osc[1].SetFreq(mtof(osc1Freq + synthmenu.noteSemiAdd2)
-                       * (1 + synthmenu.freqFine2));
+        osc.osc1.SetFreq(mtof(osc1Freq + synthmenu.noteSemiAdd)
+                         * (1 + synthmenu.freqFine));
+        osc.osc2.SetFreq(mtof(osc1Freq + synthmenu.noteSemiAdd2)
+                         * (1 + synthmenu.freqFine2));
     }
 }

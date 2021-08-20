@@ -222,7 +222,7 @@ bool Menus::OscSelect(float select)
     }
 }
 
-void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
+void Menus::Menu1(OledDisplayExtravaganza screen, oscVoice& osc)
 
 {
     screen.Fill(!on);
@@ -397,7 +397,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                 for(int i = 0; i < 2; i++)
                 {
                     selectedWave = setWave;
-                    osc[0].SetWaveform(osc[0].WAVE_SIN);
+                    osc.osc1.SetWaveform(osc.osc1.WAVE_SIN);
                 }
             }
             else if(setWave == 1)
@@ -405,7 +405,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                 for(int i = 0; i < 2; i++)
                 {
                     selectedWave = setWave;
-                    osc[0].SetWaveform(osc[0].WAVE_TRI);
+                    osc.osc1.SetWaveform(osc.osc1.WAVE_TRI);
                 }
             }
             else if(setWave == 2)
@@ -413,7 +413,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                 for(int i = 0; i < 2; i++)
                 {
                     selectedWave = setWave;
-                    osc[0].SetWaveform(osc[0].WAVE_SQUARE);
+                    osc.osc1.SetWaveform(osc.osc1.WAVE_SQUARE);
                 }
             }
             else if(setWave == 3)
@@ -421,7 +421,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                 for(int i = 0; i < 2; i++)
                 {
                     selectedWave = setWave;
-                    osc[0].SetWaveform(osc[0].WAVE_SAW);
+                    osc.osc1.SetWaveform(osc.osc1.WAVE_SAW);
                 }
             }
         }
@@ -450,7 +450,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                     for(int i = 0; i < 2; i++)
                     {
                         selectedWave2 = setWave2;
-                        osc[1].SetWaveform(osc[1].WAVE_SIN);
+                        osc.osc2.SetWaveform(osc.osc2.WAVE_SIN);
                     }
                 }
                 else if(setWave2 == 1)
@@ -458,7 +458,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                     for(int i = 0; i < 2; i++)
                     {
                         selectedWave2 = setWave2;
-                        osc[1].SetWaveform(osc[1].WAVE_TRI);
+                        osc.osc2.SetWaveform(osc.osc2.WAVE_TRI);
                     }
                 }
                 else if(setWave2 == 2)
@@ -466,7 +466,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                     for(int i = 0; i < 2; i++)
                     {
                         selectedWave2 = setWave2;
-                        osc[1].SetWaveform(osc[1].WAVE_SQUARE);
+                        osc.osc2.SetWaveform(osc.osc2.WAVE_SQUARE);
                     }
                 }
                 else if(setWave2 == 3)
@@ -474,7 +474,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
                     for(int i = 0; i < 2; i++)
                     {
                         selectedWave2 = setWave2;
-                        osc[1].SetWaveform(osc[1].WAVE_SAW);
+                        osc.osc2.SetWaveform(osc.osc2.WAVE_SAW);
                     }
                 }
             }
@@ -556,7 +556,7 @@ void Menus::Menu1(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
     screen.Update();
 }
 
-void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
+void Menus::Menu2(OledDisplayExtravaganza screen, oscVoice osc)
 {
     screen.Fill(false);
     float margin = 10;
@@ -565,7 +565,7 @@ void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
     glideInit    = (offset + (this->analogRead * screen.Height() * 0.625));
     for(int i = 0; i < screen.Width(); i++)
     {
-        screen.DrawPixel(i * 3, (screen.Height() / 2), on);
+        screen.DrawPixel(i * 3, (screen.Height() / 2), true);
     }
     if(this->buttonLeft.RisingEdge())
 
@@ -659,7 +659,7 @@ void Menus::Menu2(OledDisplayExtravaganza screen, daisysp::Oscillator osc[])
 
 
 void Menus::Menu3(OledDisplayExtravaganza screen,
-                  daisysp::Oscillator     osc[],
+                  oscVoice osc,
                   daisysp::Adsr&          env)
 {
     screen.Fill(false);
@@ -808,7 +808,7 @@ void Menus::Menu3(OledDisplayExtravaganza screen,
 }
 
 void Menus::Menu4(OledDisplayExtravaganza screen,
-                  daisysp::Oscillator     osc[],
+                  oscVoice osc,
                   daisysp::Adsr&          env)
 {
     screen.Fill(true);
