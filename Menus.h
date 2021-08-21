@@ -10,13 +10,13 @@ class Menus
     struct oscVoice
     {
         daisysp::Oscillator osc1;
-         daisysp::Oscillator osc2;
+        daisysp::Oscillator osc2;
     };
 
     Menus();
-    void Menu1(OledDisplayExtravaganza screen, oscVoice& osc);
+    void Menu1(OledDisplayExtravaganza screen, oscVoice osc[]);
     void Menu2(OledDisplayExtravaganza screen, oscVoice osc);
-    void Menu3(OledDisplayExtravaganza screen, oscVoice osc, daisysp::Adsr&);
+    void Menu3(OledDisplayExtravaganza screen, daisysp::Adsr emv[]);
     void
     Menu4(OledDisplayExtravaganza screen, oscVoice osc, daisysp::Adsr& env);
     bool OscSelect(float select);
@@ -86,6 +86,7 @@ class Menus
     float          releaseTimeScaleFilterDraw;
     float          displayAnimationMovY;
     bool           colorTemplate;
+    int            poly;
 
 
   private:

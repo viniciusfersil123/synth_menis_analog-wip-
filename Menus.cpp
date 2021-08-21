@@ -28,15 +28,14 @@ Menus::Menus()
     this->attackTime              = 0.1f;
     this->attackTime              = 0.5f;
     this->attackTimeScaleDraw     = 0.5f;
-    this-> colorTemplate = false;
+    this->colorTemplate           = false;
+    this->poly                    = 10;
 
     sprintf(this->buffPitchTime, "Time_0%%");
 }
 
 void Menus::SplashScreen(OledDisplayExtravaganza screen)
 {
-    
-   
     screen.Fill(colorTemplate);
 
     /**
@@ -45,8 +44,8 @@ void Menus::SplashScreen(OledDisplayExtravaganza screen)
  *
  * This bitmap from the file 'pt.png'
  */
-    
-   /*  const unsigned char pt[] = {
+
+    /*  const unsigned char pt[] = {
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 
@@ -127,37 +126,110 @@ void Menus::SplashScreen(OledDisplayExtravaganza screen)
         }
     } */
 
-    
-    screen.DrawRect(screen.Width()/2-10,6,screen.Width()/2+12,33,!colorTemplate,true);
-    //M
-    screen.DrawLine(screen.Width()/2-10,37,screen.Width()/2-10,52,!colorTemplate);
-    screen.DrawLine(screen.Width()/2-10,37,screen.Width()/2-10+3,52,!colorTemplate);
-    screen.DrawLine(screen.Width()/2-10+3,52,screen.Width()/2-10+6,37,!colorTemplate);
-    screen.DrawLine(screen.Width()/2-10+6,37,screen.Width()/2-10+6,52,!colorTemplate);
-    //H
-    screen.DrawLine(screen.Width()/2-10+8,52,screen.Width()/2-10+8,37,!colorTemplate);
-     screen.DrawLine(screen.Width()/2-10+8,45,screen.Width()/2-10+11,45,!colorTemplate);
-     screen.DrawLine(screen.Width()/2-10+11,52,screen.Width()/2-10+11,37,!colorTemplate);
-     //N
-    screen.DrawLine(screen.Width()/2-10+13,37,screen.Width()/2-10+13,52,!colorTemplate);
-    screen.DrawLine(screen.Width()/2-10+13,37,screen.Width()/2-10+16,52,!colorTemplate);
-    screen.DrawLine(screen.Width()/2-10+16,52,screen.Width()/2-10+16,37,!colorTemplate);
-    //I
-    screen.DrawLine(screen.Width()/2-10+18,52,screen.Width()/2-10+18,37,!colorTemplate);
-    
-    //S
-    screen.DrawLine(screen.Width()/2-10+20,37,screen.Width()/2-10+22,37,!colorTemplate);
-    screen.DrawLine(screen.Width()/2-10+20,37,screen.Width()/2-10+22,44,!colorTemplate);
-    screen.DrawLine(screen.Width()/2-10+22,44,screen.Width()/2-10+20,52,!colorTemplate);
-    screen.DrawLine(screen.Width()/2-10+20,52,screen.Width()/2-10+22,52,!colorTemplate);
-    //Animation Overlay
-    screen.DrawRect(0,displayAnimationMovY+2,screen.Width(),(screen.Height()/2+displayAnimationMovY)+2,colorTemplate,true);
-    displayAnimationMovY = displayAnimationMovY - 0.1;
-    screen.DrawRect(0,screen.Height()/2-(displayAnimationMovY+2),screen.Width(),(screen.Height()-displayAnimationMovY)+2,colorTemplate,true);
 
- 
- 
-    
+    screen.DrawRect(screen.Width() / 2 - 10,
+                    6,
+                    screen.Width() / 2 + 12,
+                    33,
+                    !colorTemplate,
+                    true);
+    //M
+    screen.DrawLine(screen.Width() / 2 - 10,
+                    37,
+                    screen.Width() / 2 - 10,
+                    52,
+                    !colorTemplate);
+    screen.DrawLine(screen.Width() / 2 - 10,
+                    37,
+                    screen.Width() / 2 - 10 + 3,
+                    52,
+                    !colorTemplate);
+    screen.DrawLine(screen.Width() / 2 - 10 + 3,
+                    52,
+                    screen.Width() / 2 - 10 + 6,
+                    37,
+                    !colorTemplate);
+    screen.DrawLine(screen.Width() / 2 - 10 + 6,
+                    37,
+                    screen.Width() / 2 - 10 + 6,
+                    52,
+                    !colorTemplate);
+    //H
+    screen.DrawLine(screen.Width() / 2 - 10 + 8,
+                    52,
+                    screen.Width() / 2 - 10 + 8,
+                    37,
+                    !colorTemplate);
+    screen.DrawLine(screen.Width() / 2 - 10 + 8,
+                    45,
+                    screen.Width() / 2 - 10 + 11,
+                    45,
+                    !colorTemplate);
+    screen.DrawLine(screen.Width() / 2 - 10 + 11,
+                    52,
+                    screen.Width() / 2 - 10 + 11,
+                    37,
+                    !colorTemplate);
+    //N
+    screen.DrawLine(screen.Width() / 2 - 10 + 13,
+                    37,
+                    screen.Width() / 2 - 10 + 13,
+                    52,
+                    !colorTemplate);
+    screen.DrawLine(screen.Width() / 2 - 10 + 13,
+                    37,
+                    screen.Width() / 2 - 10 + 16,
+                    52,
+                    !colorTemplate);
+    screen.DrawLine(screen.Width() / 2 - 10 + 16,
+                    52,
+                    screen.Width() / 2 - 10 + 16,
+                    37,
+                    !colorTemplate);
+    //I
+    screen.DrawLine(screen.Width() / 2 - 10 + 18,
+                    52,
+                    screen.Width() / 2 - 10 + 18,
+                    37,
+                    !colorTemplate);
+
+    //S
+    screen.DrawLine(screen.Width() / 2 - 10 + 20,
+                    37,
+                    screen.Width() / 2 - 10 + 22,
+                    37,
+                    !colorTemplate);
+    screen.DrawLine(screen.Width() / 2 - 10 + 20,
+                    37,
+                    screen.Width() / 2 - 10 + 22,
+                    44,
+                    !colorTemplate);
+    screen.DrawLine(screen.Width() / 2 - 10 + 22,
+                    44,
+                    screen.Width() / 2 - 10 + 20,
+                    52,
+                    !colorTemplate);
+    screen.DrawLine(screen.Width() / 2 - 10 + 20,
+                    52,
+                    screen.Width() / 2 - 10 + 22,
+                    52,
+                    !colorTemplate);
+    //Animation Overlay
+    screen.DrawRect(0,
+                    displayAnimationMovY + 2,
+                    screen.Width(),
+                    (screen.Height() / 2 + displayAnimationMovY) + 2,
+                    colorTemplate,
+                    true);
+    displayAnimationMovY = displayAnimationMovY - 0.1;
+    screen.DrawRect(0,
+                    screen.Height() / 2 - (displayAnimationMovY + 2),
+                    screen.Width(),
+                    (screen.Height() - displayAnimationMovY) + 2,
+                    colorTemplate,
+                    true);
+
+
     screen.Update();
 }
 
@@ -222,7 +294,7 @@ bool Menus::OscSelect(float select)
     }
 }
 
-void Menus::Menu1(OledDisplayExtravaganza screen, oscVoice& osc)
+void Menus::Menu1(OledDisplayExtravaganza screen, oscVoice osc[])
 
 {
     screen.Fill(!on);
@@ -394,34 +466,34 @@ void Menus::Menu1(OledDisplayExtravaganza screen, oscVoice& osc)
             }
             if(this->setWave == 0)
             {
-                for(int i = 0; i < 2; i++)
+                for(int i = 0; i < poly; i++)
                 {
                     selectedWave = setWave;
-                    osc.osc1.SetWaveform(osc.osc1.WAVE_SIN);
+                    osc[i].osc1.SetWaveform(osc[i].osc1.WAVE_SIN);
                 }
             }
             else if(setWave == 1)
             {
-                for(int i = 0; i < 2; i++)
+                for(int i = 0; i < poly; i++)
                 {
                     selectedWave = setWave;
-                    osc.osc1.SetWaveform(osc.osc1.WAVE_TRI);
+                    osc[i].osc1.SetWaveform(osc[i].osc1.WAVE_TRI);
                 }
             }
             else if(setWave == 2)
             {
-                for(int i = 0; i < 2; i++)
+                for(int i = 0; i < poly; i++)
                 {
                     selectedWave = setWave;
-                    osc.osc1.SetWaveform(osc.osc1.WAVE_SQUARE);
+                    osc[i].osc1.SetWaveform(osc[i].osc1.WAVE_SQUARE);
                 }
             }
             else if(setWave == 3)
             {
-                for(int i = 0; i < 2; i++)
+                for(int i = 0; i < poly; i++)
                 {
                     selectedWave = setWave;
-                    osc.osc1.SetWaveform(osc.osc1.WAVE_SAW);
+                    osc[i].osc1.SetWaveform(osc[i].osc1.WAVE_SAW);
                 }
             }
         }
@@ -447,34 +519,34 @@ void Menus::Menu1(OledDisplayExtravaganza screen, oscVoice& osc)
                 }
                 if(this->setWave2 == 0)
                 {
-                    for(int i = 0; i < 2; i++)
+                    for(int i = 0; i < poly; i++)
                     {
                         selectedWave2 = setWave2;
-                        osc.osc2.SetWaveform(osc.osc2.WAVE_SIN);
+                        osc[i].osc2.SetWaveform(osc[i].osc2.WAVE_SIN);
                     }
                 }
                 else if(setWave2 == 1)
                 {
-                    for(int i = 0; i < 2; i++)
+                    for(int i = 0; i < poly; i++)
                     {
                         selectedWave2 = setWave2;
-                        osc.osc2.SetWaveform(osc.osc2.WAVE_TRI);
+                        osc[i].osc2.SetWaveform(osc[i].osc2.WAVE_TRI);
                     }
                 }
                 else if(setWave2 == 2)
                 {
-                    for(int i = 0; i < 2; i++)
+                    for(int i = 0; i < poly; i++)
                     {
                         selectedWave2 = setWave2;
-                        osc.osc2.SetWaveform(osc.osc2.WAVE_SQUARE);
+                        osc[i].osc2.SetWaveform(osc[i].osc2.WAVE_SQUARE);
                     }
                 }
                 else if(setWave2 == 3)
                 {
-                    for(int i = 0; i < 2; i++)
+                    for(int i = 0; i < poly; i++)
                     {
                         selectedWave2 = setWave2;
-                        osc.osc2.SetWaveform(osc.osc2.WAVE_SAW);
+                        osc[i].osc2.SetWaveform(osc[i].osc2.WAVE_SAW);
                     }
                 }
             }
@@ -659,8 +731,8 @@ void Menus::Menu2(OledDisplayExtravaganza screen, oscVoice osc)
 
 
 void Menus::Menu3(OledDisplayExtravaganza screen,
-                  oscVoice osc,
-                  daisysp::Adsr&          env)
+                 
+                  daisysp::Adsr           env[])
 {
     screen.Fill(false);
     if(this->buttonLeft.RisingEdge())
@@ -684,7 +756,11 @@ void Menus::Menu3(OledDisplayExtravaganza screen,
     if(menuStateEnv == 0)
     {
         this->attackTime += this->encoderRight.Increment() * 3.3;
-        env.SetTime(daisysp::ADSR_SEG_ATTACK, this->attackTime / 100);
+        for(size_t i = 0; i < poly; i++)
+        {
+            env[i].SetTime(daisysp::ADSR_SEG_ATTACK, this->attackTime / 100);
+        }
+
         this->attackTimeScaleDraw += this->encoderRight.Increment();
         if(attackTimeScaleDraw >= screen.Width() / 4)
         {
@@ -707,7 +783,10 @@ void Menus::Menu3(OledDisplayExtravaganza screen,
     if(menuStateEnv == 1)
     {
         this->decayTime += this->encoderRight.Increment() * 3.3;
-        env.SetTime(daisysp::ADSR_SEG_DECAY, this->decayTime / 100);
+        for(size_t i = 0; i < poly; i++)
+        {
+            env[i].SetTime(daisysp::ADSR_SEG_DECAY, this->attackTime / 100);
+        }
         this->decayTimeScaleDraw += this->encoderRight.Increment();
         if(decayTimeScaleDraw >= screen.Width() / 4)
         {
@@ -730,7 +809,11 @@ void Menus::Menu3(OledDisplayExtravaganza screen,
     if(menuStateEnv == 2)
     {
         this->sustatinLevel += this->encoderRight.Increment() * 3.3;
-        env.SetSustainLevel(this->sustatinLevel / 100);
+            for (size_t i = 0; i < poly; i++)
+        {
+             env[i].SetSustainLevel(this->sustatinLevel / 100);
+        }
+       
         this->sustatinLevelScaleDraw += this->encoderRight.Increment();
         if(this->sustatinLevelScaleDraw >= screen.Width() / 4)
         {
@@ -753,7 +836,12 @@ void Menus::Menu3(OledDisplayExtravaganza screen,
     if(menuStateEnv == 3)
     {
         this->releaseTime += this->encoderRight.Increment() * 3.3;
-        env.SetTime(daisysp::ADSR_SEG_RELEASE, this->releaseTime / 100);
+                 for (size_t i = 0; i < poly; i++)
+        {
+             env[i].SetTime(daisysp::ADSR_SEG_RELEASE, this->releaseTime / 100);
+        }
+        
+        
         this->releaseTimeScaleDraw += this->encoderRight.Increment();
         if(this->releaseTimeScaleDraw >= screen.Width() / 4)
         {
@@ -808,7 +896,7 @@ void Menus::Menu3(OledDisplayExtravaganza screen,
 }
 
 void Menus::Menu4(OledDisplayExtravaganza screen,
-                  oscVoice osc,
+                  oscVoice                osc,
                   daisysp::Adsr&          env)
 {
     screen.Fill(true);

@@ -15,7 +15,7 @@ DaisySeed                              hw;
 OledDisplayExtravaganza                screen;
 const int                              height = screen.Height();
 const int                              width  = screen.Width();
-const int                              poly   = 32;
+const int                              poly   = 10;
 Menus::oscVoice                        osc[poly];
 Line                                   line[poly];
 Adsr                                   env[poly];
@@ -23,54 +23,56 @@ bool                                   gate[poly];
 MidiHandler<MidiUartTransport>         midi;
 MidiHandler<MidiUartTransport>::Config midi_cfg;
 float                                  semiMultiplier = 1;
-float                                  osc1Freq       = 0;
+float                                  osc1Freq[poly];
 uint8_t                                finished;
-int                                    navigation = 0;
-int                                    count      = 0;
-bool                                   splashInit = true;
-int                                    polyIndexOn;
-int                                    polyIndexOff;
+int                                    navigation   = 0;
+int                                    count        = 0;
+bool                                   splashInit   = true;
+int                                    polyIndexOn  = 0;
+int                                    polyIndexOff = 0;
+float                                  freq1;
+float                                  freq2;
 
 void HandleMidiMessage(MidiEvent m)
 {
     switch(m.type)
     {
         case NoteOn:
+
         {
+            if(polyIndexOn > poly - 1)
+            {
+                polyIndexOn = 0;
+            }
             NoteOnEvent p = m.AsNoteOn();
-            char        buff[512];
-            sprintf(buff,
-                    "Note Received:\t%d\t%d\t%d\r\n",
-                    m.channel,
-                    m.data[0],
-                    m.data[1]);
-            hw.usb_handle.TransmitInternal((uint8_t *)buff, strlen(buff));
-            // This is to avoid Max/MSP Note outs for now..
             if(m.data[1] != 0)
             {
-                //osc1Freq = p.note;
-                line[0].Start(p.note + (synthmenu.glideInit * 0.25),
-                              p.note,
-                              synthmenu.glideTime / 100);
-                gate[0] = true;
-                //env.Retrigger(true);
+                line[polyIndexOn].Start(p.note + (synthmenu.glideInit * 0.25),
+                                        p.note,
+                                        synthmenu.glideTime / 100);
+                gate[polyIndexOn] = true;
+
+                freq1 = mtof(p.note + synthmenu.noteSemiAdd)
+                        * (1 + synthmenu.freqFine);
+                freq2 = mtof(p.note + synthmenu.noteSemiAdd2)
+                        * (1 + synthmenu.freqFine2);
+   osc[polyIndexOn].osc1.SetFreq(freq1);
+        osc[polyIndexOn].osc2.SetFreq(freq2);
+                polyIndexOn = polyIndexOn + 1;
             }
         }
         break;
 
         case NoteOff:
         {
-            char buff[512];
-            sprintf(buff,
-                    "NoteOff Received:\t%d\t%d\t%d\r\n",
-                    m.channel,
-                    m.data[0],
-                    m.data[1]);
-            hw.usb_handle.TransmitInternal((uint8_t *)buff, strlen(buff));
-            // This is to avoid Max/MSP Note outs for now..
             if(m.data[1] != 0)
             {
-                gate[0] = false;
+                if(polyIndexOff > poly - 1)
+                {
+                    polyIndexOff = 0;
+                }
+                gate[polyIndexOff] = false;
+                polyIndexOff       = polyIndexOff + 1;
             }
         }
         break;
@@ -84,17 +86,43 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
                    size_t                                size)
 {
     float osc_out;
-    float env_out;
+    float env_out[32];
     for(size_t i = 0; i < size; i += 2)
     {
-        env_out = env[0].Process(gate[0]);
+        for(size_t i = 0; i < poly; i++)
+        {
+            env_out[i] = env[i].Process(gate[i]);
+        }
 
-        osc[0].osc1.SetAmp((env_out * 0.5) * synthmenu.synthOn);
-        osc[0].osc2.SetAmp((env_out * 0.5) * synthmenu.synthOn2);
-        osc_out    = osc[0].osc1.Process() + osc[0].osc2.Process();
-        osc1Freq   = line[0].Process(&finished);
-        out[i]     = osc_out;
-        out[i + 1] = osc_out;
+        for(size_t i = 0; i < poly; i++)
+        {
+            osc[i].osc1.SetAmp((env_out[i] * 0.5) * synthmenu.synthOn);
+            osc[i].osc2.SetAmp((env_out[i] * 0.5) * synthmenu.synthOn2);
+        }
+
+
+        for(size_t i = 0; i < poly; i++)
+        {
+            if(i == 0)
+            {
+                osc_out = osc[i].osc1.Process() + osc[i].osc2.Process();
+            }
+            else
+            {
+                osc_out
+                    = osc_out + osc[i].osc1.Process() + osc[i].osc2.Process();
+            }
+        }
+
+        //osc_out    = osc[0].osc1.Process() + osc[0].osc2.Process();
+        for(size_t i = 0; i < poly; i++)
+        {
+            osc1Freq[i] = line[i].Process(&finished);
+        }
+
+
+        out[i]     = osc_out * 0.25;
+        out[i + 1] = osc_out * 0.25;
     }
 }
 
@@ -194,7 +222,7 @@ int main(void)
         }
         else if(navigation == 1)
         {
-            synthmenu.Menu1(screen, osc[0]);
+            synthmenu.Menu1(screen, osc);
         }
         else if(navigation == 2)
         {
@@ -202,7 +230,7 @@ int main(void)
         }
         else if(navigation == 3)
         {
-            synthmenu.Menu3(screen, osc[0], env[0]);
+            synthmenu.Menu3(screen, env);
         }
 
 
@@ -210,9 +238,6 @@ int main(void)
         {
             HandleMidiMessage(midi.PopEvent());
         }
-        osc[0].osc1.SetFreq(mtof(osc1Freq + synthmenu.noteSemiAdd)
-                            * (1 + synthmenu.freqFine));
-        osc[0].osc2.SetFreq(mtof(osc1Freq + synthmenu.noteSemiAdd2)
-                            * (1 + synthmenu.freqFine2));
+     
     }
 }
