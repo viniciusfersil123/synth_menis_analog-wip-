@@ -639,6 +639,10 @@ void Menus::Menu2(OledDisplayExtravaganza screen, oscVoice osc)
     {
         screen.DrawPixel(i * 3, (screen.Height() / 2), true);
     }
+    for(int i = 0; i < screen.Width(); i++)
+    {
+        screen.DrawPixel(i * 3, (screen.Height() / 2), true);
+    }
     if(this->buttonLeft.RisingEdge())
 
     {
@@ -731,8 +735,8 @@ void Menus::Menu2(OledDisplayExtravaganza screen, oscVoice osc)
 
 
 void Menus::Menu3(OledDisplayExtravaganza screen,
-                 
-                  daisysp::Adsr           env[])
+
+                  daisysp::Adsr env[])
 {
     screen.Fill(false);
     if(this->buttonLeft.RisingEdge())
@@ -809,11 +813,11 @@ void Menus::Menu3(OledDisplayExtravaganza screen,
     if(menuStateEnv == 2)
     {
         this->sustatinLevel += this->encoderRight.Increment() * 3.3;
-            for (size_t i = 0; i < poly; i++)
+        for(size_t i = 0; i < poly; i++)
         {
-             env[i].SetSustainLevel(this->sustatinLevel / 100);
+            env[i].SetSustainLevel(this->sustatinLevel / 100);
         }
-       
+
         this->sustatinLevelScaleDraw += this->encoderRight.Increment();
         if(this->sustatinLevelScaleDraw >= screen.Width() / 4)
         {
@@ -836,12 +840,12 @@ void Menus::Menu3(OledDisplayExtravaganza screen,
     if(menuStateEnv == 3)
     {
         this->releaseTime += this->encoderRight.Increment() * 3.3;
-                 for (size_t i = 0; i < poly; i++)
+        for(size_t i = 0; i < poly; i++)
         {
-             env[i].SetTime(daisysp::ADSR_SEG_RELEASE, this->releaseTime / 100);
+            env[i].SetTime(daisysp::ADSR_SEG_RELEASE, this->releaseTime / 100);
         }
-        
-        
+
+
         this->releaseTimeScaleDraw += this->encoderRight.Increment();
         if(this->releaseTimeScaleDraw >= screen.Width() / 4)
         {

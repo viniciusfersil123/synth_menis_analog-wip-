@@ -23,8 +23,8 @@ bool                                   gate[poly];
 MidiHandler<MidiUartTransport>         midi;
 MidiHandler<MidiUartTransport>::Config midi_cfg;
 float                                  semiMultiplier = 1;
-float                                  osc1Freq[poly];
-uint8_t                                finished;
+float                                  GlideFreq[poly];
+uint8_t                                finished[poly];
 int                                    navigation   = 0;
 int                                    count        = 0;
 bool                                   splashInit   = true;
@@ -56,8 +56,8 @@ void HandleMidiMessage(MidiEvent m)
                         * (1 + synthmenu.freqFine);
                 freq2 = mtof(p.note + synthmenu.noteSemiAdd2)
                         * (1 + synthmenu.freqFine2);
-   osc[polyIndexOn].osc1.SetFreq(freq1);
-        osc[polyIndexOn].osc2.SetFreq(freq2);
+                osc[polyIndexOn].osc1.SetFreq(freq1);
+                osc[polyIndexOn].osc2.SetFreq(freq2);
                 polyIndexOn = polyIndexOn + 1;
             }
         }
@@ -117,7 +117,7 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
         //osc_out    = osc[0].osc1.Process() + osc[0].osc2.Process();
         for(size_t i = 0; i < poly; i++)
         {
-            osc1Freq[i] = line[i].Process(&finished);
+           GlideFreq[i] = line[i].Process(&finished[i]);
         }
 
 
@@ -125,7 +125,6 @@ void AudioCallback(AudioHandle::InterleavingInputBuffer  in,
         out[i + 1] = osc_out * 0.25;
     }
 }
-
 int main(void)
 {
     hw.Configure();
@@ -148,9 +147,9 @@ int main(void)
     screen.Init(disp_cfg);
     synthmenu.buttonLeft.Init(hw.GetPin(27), (samplerate));
     synthmenu.buttonRight.Init(hw.GetPin(26), (samplerate));
-    synthmenu.encoderLeft.Init(
-        hw.GetPin(16), hw.GetPin(17), hw.GetPin(15), samplerate);
     synthmenu.encoderRight.Init(
+        hw.GetPin(16), hw.GetPin(17), hw.GetPin(15), samplerate);
+    synthmenu.encoderLeft.Init(
         hw.GetPin(19), hw.GetPin(20), hw.GetPin(18), samplerate);
     hw.StartAudio(AudioCallback);
 
@@ -166,8 +165,13 @@ int main(void)
         osc[i].osc2.SetFreq(440);
     }
 
+    for (size_t i = 0; i <poly; i++)
+    {
+       line[i].Init(samplerate); 
+    }
+    
+    
 
-    line[0].Init(samplerate);
     for(size_t i = 0; i < poly; i++)
     {
         env[i].Init(samplerate);
@@ -199,9 +203,9 @@ int main(void)
         navigation += synthmenu.encoderLeft.Increment();
         if(splashInit == false)
         {
-            if(navigation > 3)
+            if(navigation > 2)
             {
-                navigation = 3;
+                navigation = 2;
             }
             if(navigation < 1)
             {
@@ -226,18 +230,13 @@ int main(void)
         }
         else if(navigation == 2)
         {
-            synthmenu.Menu2(screen, osc[0]);
+             synthmenu.Menu3(screen, env);
         }
-        else if(navigation == 3)
-        {
-            synthmenu.Menu3(screen, env);
-        }
-
+  
 
         if(midi.HasEvents())
         {
             HandleMidiMessage(midi.PopEvent());
         }
-     
     }
 }
